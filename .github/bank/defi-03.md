@@ -37,7 +37,7 @@ Répondez avec des phrases complètes :
 Puis :
 
 ```bash
-git add travail/preuves/defi03.txt
+git add travail/index.html travail/preuves/defi03.txt
 git commit -m "Défi 03 - Comprendre status et add"
 git push
 ```

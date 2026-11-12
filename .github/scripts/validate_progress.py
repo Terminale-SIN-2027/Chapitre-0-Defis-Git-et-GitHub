@@ -136,7 +136,7 @@ def valid(n):
         return (
             proof(10)
             and ("design sin" in ncss or "text-align" in ncss)
-            and branch_contains("feature-design", c)
+            and bool(branch_ref("feature-design"))
             and branch_contains("main", c)
         )
 
@@ -173,8 +173,17 @@ def diagnostic(n):
         if "git version" in id_txt.lower() and not identite_has_name(id_txt):
             return "N'oubliez pas d'écrire votre Prénom et NOM dans `travail/identite.txt` en plus de la version de Git."
         return "Complétez `travail/identite.txt` avec votre nom et la ligne obtenue grâce à `git --version`."
+    if n == 3:
+        if proof(3) and "mon premier projet sin" not in norm(read(WORK / "index.html")):
+            return "Votre preuve `defi03.txt` est bien présente, mais `<p>Mon premier projet SIN</p>` n'est pas dans `travail/index.html` sur GitHub. Vérifiez que vous avez bien enregistré `index.html` (Ctrl+S) puis fait `git add travail/index.html`, `git commit` et `git push`."
+    if n == 4:
+        if proof(4) and "premier commit" not in norm(read(WORK / "index.html")):
+            return "Votre preuve `defi04.txt` est bien présente, mais `<p>Premier commit</p>` n'apparaît pas dans `travail/index.html` sur GitHub. N'oubliez pas `git add travail/index.html`, `git commit` et `git push`."
     if n == 5:
         return "Lancez `git log --oneline` et copiez bien le hash court (ex: `a1b2c3d`) et le message d'un commit dans `travail/preuves/defi05.txt`."
+    if n == 8:
+        if tracked(WORK / "secret.txt") or tracked(ROOT / "secret.txt"):
+            return "Attention : `secret.txt` a été ajouté à Git par erreur ! Exécutez `git rm --cached travail/secret.txt`, vérifiez que `secret.txt` est dans `travail/.gitignore`, puis refaites un commit et `git push`."
     if n == 10:
         c = last_commit(PROOFS / "defi10.txt")
         if branch_contains("feature-design", c) and not branch_contains("main", c):
