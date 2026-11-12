@@ -1,1 +1,5 @@
-Prénom NOM :\nClasse : Terminale STI2D SIN\n\n# Copiez ci-dessous la ligne obtenue avec git --version :\n
+Prénom NOM : 
+Classe : Terminale STI2D SIN
+
+# Copiez ci-dessous la ligne obtenue avec git --version :
+
