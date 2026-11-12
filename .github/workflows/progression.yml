@@ -6,23 +6,54 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: validation-${{ github.repository }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: validation-${{ github.repository }}
+  cancel-in-progress: false
 
 jobs:
   validation:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+
       - name: Installer Python
         uses: actions/setup-python@v7
         with:
           python-version: '3.13'
-      - name: Vérifier la progression
+
+      - name: Vérifier la progression et débloquer le défi suivant
+        id: check
         run: python .github/scripts/validate_progress.py
+
+      - name: Publier le défi débloqué dans le dépôt
+        if: github.repository != 'Terminale-SIN-2027/Chapitre-0-Initiation-Git-GitHub' && github.repository != 'djamelbennour/Chapitre-0-Initialisation-Git-GitHub'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md defis/
+          if git diff --cached --quiet; then
+            echo "Aucune mise à jour de défi à publier."
+            exit 0
+          fi
+          MSG="${{ steps.check.outputs.status_msg }}"
+          if [ -z "$MSG" ]; then
+            MSG="Mise à jour de la progression"
+          fi
+          git commit -m "🔓 $MSG [skip ci]"
+          git push origin "HEAD:${{ github.ref_name }}"
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            git fetch origin main
+            git checkout -B main origin/main
+            git checkout "${{ github.ref_name }}" -- README.md defis/
+            git add README.md defis/
+            if ! git diff --cached --quiet; then
+              git commit -m "🔓 $MSG [skip ci]"
+              git push origin main
+            fi
+          fi

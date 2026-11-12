@@ -55,4 +55,4 @@ Aucune réponse écrite n'est encore demandée. Soyez capable d'expliquer :
 - ce que `git add` a changé dans `git status`.
 
 ## ✅ Validation
-Sur GitHub : **Actions → Validation des défis → dernière exécution → Summary**.
+Actualisez la page principale de votre dépôt GitHub (**`<> Code`**) ~15 secondes après votre `git push` : le **Défi 03** s'affichera automatiquement sur la page d'accueil et dans `defis/defi-03.md`. Tapez ensuite `git pull` dans VS Code.

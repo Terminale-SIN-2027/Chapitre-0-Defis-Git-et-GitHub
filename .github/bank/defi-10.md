@@ -26,11 +26,12 @@ Dans `travail/preuves/defi10.txt`, expliquez :
 
 Ajoutez les deux fichiers, créez un commit et poussez `feature-design`.
 
-Revenez ensuite sur la branche principale :
+Revenez ensuite sur la branche principale, récupérez la dernière version et fusionnez :
 
 ```bash
 git switch main
-git merge feature-design
+git pull
+git merge feature-design --no-edit
 git push
 ```
 

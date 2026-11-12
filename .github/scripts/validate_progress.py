@@ -5,6 +5,11 @@ import os, re, subprocess, sys, unicodedata
 ROOT = Path(__file__).resolve().parents[2]
 WORK = ROOT / "travail"
 PROOFS = WORK / "preuves"
+DEFIS = ROOT / "defis"
+README = ROOT / "README.md"
+
+START_MARKER = "<!-- PROGRESSION:START -->"
+END_MARKER = "<!-- PROGRESSION:END -->"
 
 
 def read(path):
@@ -187,7 +192,7 @@ def diagnostic(n):
     if n == 10:
         c = last_commit(PROOFS / "defi10.txt")
         if branch_contains("feature-design", c) and not branch_contains("main", c):
-            return "Votre travail est bien sur `feature-design`. Il ne vous reste plus qu'à revenir sur `main` (`git switch main`), fusionner (`git merge feature-design`) et pousser (`git push`)."
+            return "Votre travail est bien sur `feature-design`. Il ne vous reste plus qu'à revenir sur `main` (`git switch main`), récupérer (`git pull`), fusionner (`git merge feature-design --no-edit`) et pousser (`git push`)."
 
     hints = {
         2: "Vérifiez `travail/index.html` (`<h1>Projet Terminale SIN</h1>`) et `travail/style.css` (`body { font-family: Arial; }`), puis assurez-vous qu'ils ont été committés et poussés.",
@@ -204,6 +209,114 @@ def diagnostic(n):
     return hints.get(n, "Commencez par `git status`, relisez le défi puis vérifiez vos fichiers.")
 
 
+def sync_defis_files(completed):
+    DEFIS.mkdir(exist_ok=True)
+    unlocked_up_to = min(completed + 1, 12)
+    for k in range(2, 13):
+        target = DEFIS / f"defi-{k:02d}.md"
+        bank = ROOT / ".github" / "bank" / f"defi-{k:02d}.md"
+        if k <= unlocked_up_to and bank.exists():
+            pull_banner = (
+                f"> 🔄 **Dans VS Code :** commencez par synchroniser votre dépôt local avec `git pull` "
+                f"avant de réaliser ce Défi {k:02d}.\n\n"
+            )
+            content = pull_banner + read(bank).strip() + "\n"
+        else:
+            content = (
+                f"# 🔒 Défi {k:02d}\n\n"
+                f"Ce défi est actuellement verrouillé. Il sera débloqué automatiquement ici "
+                f"(et sur la page d'accueil du dépôt) dès que le **Défi {k-1:02d}** sera validé.\n"
+            )
+        if read(target) != content:
+            target.write_text(content, encoding="utf-8")
+
+
+def build_readme_block(completed):
+    if completed == 0:
+        default_id = "Prénom NOM : \nClasse : Terminale STI2D SIN\n\n# Copiez ci-dessous la ligne obtenue avec git --version :"
+        attempted = read(WORK / "identite.txt").strip() != default_id.strip()
+        block = [
+            START_MARKER,
+            "## 🚦 Votre progression : 0/12 (0%)",
+            "",
+            "⬜" * 12,
+            "",
+            '<div align="center">',
+            "",
+            "### 👉 [🚀 COMMENCER LE DÉFI 01 — Prendre en main son dépôt](defis/defi-01.md)",
+            "",
+            "</div>",
+            "",
+            "> 💡 Dès que vous aurez terminé et poussé (`git push`) un défi, **actualisez cette page GitHub après ~15 secondes** : le défi suivant s'affichera automatiquement ici et sera débloqué dans le dossier [`defis/`](defis/) !",
+        ]
+        if attempted:
+            block += [
+                "",
+                f"> **🛟 Aide au diagnostic (Défi 01 non encore validé) :** {diagnostic(1)}",
+            ]
+        block.append(END_MARKER)
+        return "\n".join(block)
+
+    if completed >= 12:
+        return "\n".join(
+            [
+                START_MARKER,
+                "# 🏆 Parcours terminé : 12/12 (100%) !",
+                "",
+                "🟩" * 12,
+                "",
+                "🎉 **Félicitations ! Vous avez validé l'ensemble des 12 défis Git & GitHub.**",
+                "",
+                "Vous pouvez maintenant consulter [🚀 **Pour aller plus loin**](docs/POUR-ALLER-PLUS-LOIN.md).",
+                END_MARKER,
+            ]
+        )
+
+    nxt = completed + 1
+    percent = round(completed / 12 * 100)
+    bar = "🟩" * completed + "⬜" * (12 - completed)
+    bank = ROOT / ".github" / "bank" / f"defi-{nxt:02d}.md"
+    bank_text = read(bank).strip() if bank.exists() else f"⚠️ Énoncé du Défi {nxt:02d} introuvable."
+    return "\n".join(
+        [
+            START_MARKER,
+            f"## ✅ Votre progression : {completed}/12 ({percent}%)",
+            "",
+            bar,
+            "",
+            '<div align="center">',
+            "",
+            f"### 👉 [🔓 DÉFI {nxt:02d} DÉBLOQUÉ — Ouvrir defis/defi-{nxt:02d}.md](defis/defi-{nxt:02d}.md)",
+            "",
+            "</div>",
+            "",
+            f"> 🔄 **Dans VS Code :** tapez `git pull` dans le terminal pour récupérer le fichier `defis/defi-{nxt:02d}.md` sur votre ordinateur avant de commencer.",
+            "",
+            "---",
+            "",
+            bank_text,
+            "",
+            "---",
+            "",
+            f"> **🛟 Aide au diagnostic** *(si vous venez de tenter le Défi {nxt:02d} et qu'il n'est pas encore validé)* :",
+            f"> {diagnostic(nxt)}",
+            END_MARKER,
+        ]
+    )
+
+
+def update_readme(completed):
+    if not README.exists():
+        return
+    txt = read(README)
+    new_block = build_readme_block(completed)
+    if START_MARKER in txt and END_MARKER in txt:
+        pattern = re.compile(re.escape(START_MARKER) + r".*?" + re.escape(END_MARKER), re.DOTALL)
+        updated = pattern.sub(lambda _: new_block, txt)
+        if updated != txt:
+            README.write_text(updated, encoding="utf-8")
+
+
 completed = 0
 for n in range(1, 13):
     if valid(n):
@@ -211,8 +324,12 @@ for n in range(1, 13):
     else:
         break
 
+sync_defis_files(completed)
+update_readme(completed)
+
 lines = ["# 🎓 Terminale SIN — Progression", ""]
 if completed == 0:
+    status_msg = "Défi 01 à réaliser (0/12)"
     lines += [
         "## 🚦 Défi 01 à réaliser",
         "",
@@ -221,6 +338,7 @@ if completed == 0:
         f"**🛟 Aide :** {diagnostic(1)}",
     ]
 elif completed >= 12:
+    status_msg = "Parcours terminé (12/12)"
     lines += [
         "# 🏆 Parcours terminé !",
         "",
@@ -230,6 +348,7 @@ elif completed >= 12:
     ]
 else:
     nxt = completed + 1
+    status_msg = f"Défi {nxt:02d} débloqué ({completed}/12)"
     percent = round(completed / 12 * 100)
     bar = "🟩" * completed + "⬜" * (12 - completed)
     bank = ROOT / ".github" / "bank" / f"defi-{nxt:02d}.md"
@@ -252,5 +371,12 @@ else:
 summary = os.environ.get("GITHUB_STEP_SUMMARY")
 if summary:
     Path(summary).write_text("\n".join(lines), encoding="utf-8")
+
+gh_out = os.environ.get("GITHUB_OUTPUT")
+if gh_out:
+    with open(gh_out, "a", encoding="utf-8") as f:
+        f.write(f"status_msg={status_msg}\n")
+        f.write(f"completed={completed}\n")
+
 print(f"Progression détectée : {completed}/12")
 sys.exit(0)

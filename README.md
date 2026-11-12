@@ -23,21 +23,33 @@ Découvrir **Git et GitHub** en construisant progressivement un mini-projet web 
 | 🟣 Branches | 09–10 | branch, switch, push -u, merge |
 | 🏁 Autonomie | 11–12 | origin, local/distant, mini-projet final |
 
-## 🚦 Fonctionnement
+---
 
-1. Réalisez uniquement le défi affiché.
-2. À partir du Défi 03, complétez votre **carnet de bord** dans `travail/preuves/`.
-3. Faites `git add`, `git commit`, puis `git push`.
-4. Sur GitHub, ouvrez **Actions → Validation des défis**.
-5. Consultez le résumé : il valide votre progression, affiche une aide en cas de blocage et révèle le défi suivant.
+<!-- PROGRESSION:START -->
+## 🚦 Votre progression : 0/12 (0%)
 
-> 💡 Les premiers défis sont très guidés. Les consignes diminuent progressivement pour vous rendre autonome.
+⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
 
 <div align="center">
 
-### [🚀 Commencer le Défi 01](defis/defi-01.md)
+### 👉 [🚀 COMMENCER LE DÉFI 01 — Prendre en main son dépôt](defis/defi-01.md)
 
 </div>
+
+> 💡 Dès que vous aurez terminé et poussé (`git push`) un défi, **actualisez cette page GitHub après ~15 secondes** : le défi suivant s'affichera automatiquement ici et sera débloqué dans le dossier [`defis/`](defis/) !
+<!-- PROGRESSION:END -->
+
+---
+
+## 🚦 Fonctionnement
+
+1. Réalisez uniquement le défi actuellement débloqué.
+2. Au début de chaque nouveau défi dans VS Code, lancez `git pull` pour récupérer l'énoncé débloqué.
+3. À partir du Défi 03, complétez votre **carnet de bord** dans `travail/preuves/`.
+4. Faites `git add`, `git commit`, puis `git push`.
+5. Actualisez la page principale de votre dépôt GitHub après ~15 secondes : votre progression se met à jour et le défi suivant se débloque automatiquement dans [`README.md`](README.md) et dans [`defis/`](defis/).
+
+> 💡 Les premiers défis sont très guidés. Les consignes diminuent progressivement pour vous rendre autonome.
 
 ## 🧠 Le réflexe Git
 

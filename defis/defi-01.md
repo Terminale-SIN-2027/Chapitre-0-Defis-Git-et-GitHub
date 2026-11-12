@@ -47,6 +47,7 @@ Vous devez obtenir une ligne commençant par `git version`.
 ```bash
 git config user.name "Prénom NOM"
 git config user.email "prenom.nom@lycee-jeanrostand.fr"
+git config pull.rebase true
 ```
 
 Vérifiez :
@@ -86,8 +87,8 @@ Aucune réponse écrite n'est demandée pour ce premier défi. Soyez simplement 
 
 ## ✅ Validation
 
-Sur GitHub : **Actions → Validation des défis → dernière exécution → Summary**.
-
-Si le Défi 01 est validé, le **Défi 02** sera affiché.
+Actualisez la page principale de votre dépôt sur GitHub (**`<> Code`**) environ 15 secondes après votre `git push` :
+- Si le Défi 01 est validé, la barre de progression passera à **1/12** et le **Défi 02** apparaîtra automatiquement sur la page d'accueil et dans `defis/defi-02.md` !
+- Dans VS Code, tapez ensuite `git pull` pour récupérer `defis/defi-02.md` sur votre ordinateur.
 
 > Ne modifiez jamais le dossier `.github/`.
